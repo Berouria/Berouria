@@ -1,3 +1,5 @@
+import requests
+
 class Task:
     def __init__(self, id, title, completed):
         self.id = id
@@ -10,32 +12,43 @@ class Task:
 class TaskManager:
     def __init__(self):
         self.tasks = []
+        self.url = "https://jsonplaceholder.typicode.com/todos/"
 
     def get_all_tasks(self):
-        return self.tasks
+        response = requests.get(self.url)
+        tasks_data = response.json()
+        self.tasks = []
+        for task_data in tasks_data:
+            task = Task(task_data["id"], task_data["title"], task_data["completed"])
+            self.tasks.append(task)
 
-    def get_task_by_id(self, task_id):
-        for task in self.tasks:
-            if task['id'] == task_id:
-                return task
-        return None
+    def get_task(self, task_id):
+      response = requests.get(self.url + str(task_id))
+        task_data = response.json()
+        task = Task(task_data["id"], task_data["title"], task_data["completed"])
+        return task
 
-    def create_task(self, new_task):
-        self.tasks.append(new_task)
+    def create_task(self, title):
+        data = {"title": title, "completed": False}
+        response = requests.post(self.url, data=data)
+        task_data = response.json()
+        task = Task(task_data["id"], task_data["title"], task_data["completed"])
+        self.tasks.append(task)
 
-    def modify_task(self, task_id, updated_task):
-        for i in range(len(self.tasks)):
-            if self.tasks[i]['id'] == task_id:
-                self.tasks[i] = updated_task
-                return True
-        return False
+    def update_task(self, task_id, title, completed):
+        data = {"title": title, "completed": completed}
+        response = requests.put(self.url + str(task_id), data=data)
+        task_data = response.json()
+        task = Task(task_data["id"], task_data["title"], task_data["completed"])
+        for i, t in enumerate(self.tasks):
+            if t.id == task_id:
+                self.tasks[i] = task
 
     def delete_task(self, task_id):
-        for i in range(len(self.tasks)):
-            if self.tasks[i]['id'] == task_id:
-                del self.tasks[i]
-                return True
-        return False
+        response = requests.delete(self.url + str(task_id))
+        for i, task in enumerate(self.tasks):
+            if task.id == task_id:
+                self.tasks.pop(i)
 
     def display_tasks(self):
         for task in self.tasks:
