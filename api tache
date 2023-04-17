@@ -6,3 +6,37 @@ class Task:
 
     def __str__(self):
         return f"Task {self.id}: {self.title} (completed: {self.completed})"
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = []
+
+    def get_all_tasks(self):
+        return self.tasks
+
+    def get_task_by_id(self, task_id):
+        for task in self.tasks:
+            if task['id'] == task_id:
+                return task
+        return None
+
+    def create_task(self, new_task):
+        self.tasks.append(new_task)
+
+    def modify_task(self, task_id, updated_task):
+        for i in range(len(self.tasks)):
+            if self.tasks[i]['id'] == task_id:
+                self.tasks[i] = updated_task
+                return True
+        return False
+
+    def delete_task(self, task_id):
+        for i in range(len(self.tasks)):
+            if self.tasks[i]['id'] == task_id:
+                del self.tasks[i]
+                return True
+        return False
+
+    def display_tasks(self):
+        for task in self.tasks:
+            print(task)
